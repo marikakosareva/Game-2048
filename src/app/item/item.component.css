@@ -1,0 +1,13 @@
+div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: #a13790;
+    margin: 5px;
+    border-radius: 5px;
+    color: cornsilk;
+    position: absolute;
+    top: 335px; left: 335px;
+}

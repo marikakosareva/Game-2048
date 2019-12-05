@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HostListener } from '@angular/core';
 import {
   trigger,
@@ -14,36 +14,77 @@ import {
   styleUrls: ['./app.component.css'],
   animations: [
     trigger('itemState',[
-      state('left', style({
-        transform: 'translateX(-100px)'
+      state('00', style({
+        transform: 'translate(0px, 0px)'
       })),
-      state('right', style({
-        transform: 'translateX(+100px)'
+      state('01', style({
+        transform: 'translate(110px, 0px)'
       })),
-      state('up', style({
-        transform: 'translateY(-100px)'
+      state('02', style({
+        transform: 'translate(220px, 0px)'
       })),
-      state('down', style({
-        transform: 'translateY(+100px)'
+      state('03', style({
+        transform: 'translate(330px, 0px)'
       })),
-      transition('* => *', animate('0ms ease')),
-    ]
-
+      state('10', style({
+        transform: 'translate(0px, 110px)'
+      })),
+      state('11', style({
+        transform: 'translate(110px, 110px)'
+      })),
+      state('12', style({
+        transform: 'translate(220px, 110px)'
+      })),
+      state('13', style({
+        transform: 'translate(330px, 110px)'
+      })),
+      state('20', style({
+        transform: 'translate(0px, 220px)'
+      })),
+      state('21', style({
+        transform: 'translate(110px, 220px)'
+      })),
+      state('22', style({
+        transform: 'translate(220px, 220px)'
+      })),
+      state('23', style({
+        transform: 'translate(330px, 220px)'
+      })),
+      state('30', style({
+        transform: 'translate(0px, 330px)'
+      })),
+      state('31', style({
+        transform: 'translate(110px, 330px)'
+      })),
+      state('32', style({
+        transform: 'translate(220px, 330px)'
+      })),
+      state('33', style({
+        transform: 'translate(330px, 330px)'
+      })),
+      transition('* => *', animate('2000ms ease')),
+      ]
     )
   ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'game2048';
   position: string;
+  
+  elements = [];
 
   data = [
-    [0, 2, 0, 0],
-    [2, 2, 0, 0],
-    [0, 0, 2, 0],
-    [4, 0, 0, 0]
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null],
+    [null, null, null, null]
   ];
 
   size = 4;
+
+  ngOnInit() {
+    this.newNumber();
+  }
 
   getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
@@ -53,7 +94,7 @@ export class AppComponent {
     let emptySpots = 0;
     for (let i = 0; i < this.size; i++){
       for (let j = 0; j < this.size; j++){
-        if (this.data[i][j] === 0) {
+        if (this.data[i][j] === null) {
           emptySpots ++;
         }
       }
@@ -62,9 +103,10 @@ export class AppComponent {
     let index = this.getRandomInt(emptySpots);
     outer:  for (let i = 0; i < this.size; i++){
         for (let j = 0; j < this.size; j++){
-          if (this.data[i][j] === 0) {
+          if (this.data[i][j] === null) {
             if (index === 0) {
-              this.data[i][j] = 2;
+              this.data[i][j] = {position:`${i}${j}`, number: 2};
+              this.elements.push(this.data[i][j]);
               break outer;
             } else {
               index --;
@@ -72,10 +114,10 @@ export class AppComponent {
           }
         }
       }
-    }
+  }
 
   changePosition(newPosition: string){
-    this.position = newPosition;
+      this.position = newPosition;
   }
 
   @HostListener('document:keyup', ['$event'])
@@ -100,11 +142,15 @@ export class AppComponent {
         for (let i = 0; i < this.size; i++){
           buf[i] = this.data[i][j];
         }
-        buf = buf.filter(item => item > 0);
+        buf = buf.filter(item => item !== null);
         //zeros += buf.filter(item => item === 0);
         for (let k = 0; k < buf.length; k++){
-            if (buf[k] === buf[k+1]) {
-              buf2.push(buf[k]*2);
+            if (k === buf.length - 1){
+              buf2.push(buf[k]);
+            } else if (buf[k].number === buf[k+1].number) {
+              buf[k+1].number *= 2;
+              buf2.push(buf[k+1]);
+              this.elements.splice(this.elements.indexOf(buf[k]), 1);
               k++;
               //zeros += 1;
             }
@@ -113,8 +159,13 @@ export class AppComponent {
             }
         }
         for (let k = 0; k < this.size; k++){
-          if (k < buf2.length) this.data[k][j] = buf2[k];
-          else this.data[k][j] = 0;
+          if (k < buf2.length) {
+            this.data[k][j] = buf2[k];
+            this.data[k][j].position = `${k}${j}`;
+          }
+          else {
+            this.data[k][j] = null;
+          }
         }
       }
     }
@@ -130,11 +181,15 @@ export class AppComponent {
           for (let i = 0; i < this.size; i++){
             buf[i] = this.data[this.size - i - 1][j];
           }
-          buf = buf.filter(item => item > 0);
+          buf = buf.filter(item => item !== null);
           //zeros += buf.filter(item => item === 0);
           for (let k = 0; k < buf.length; k++){
-              if (buf[k] === buf[k+1]) {
-                buf2.push(buf[k]*2);
+              if (k === buf.length - 1){
+                buf2.push(buf[k]);
+              } else if (buf[k].number === buf[k+1].number) {
+                buf[k+1].number *= 2;
+                buf2.push(buf[k+1]);
+                this.elements.splice(this.elements.indexOf(buf[k]), 1);
                 k++;
                 //zeros += 1;
               }
@@ -143,8 +198,13 @@ export class AppComponent {
               }
           }
           for (let k = 0; k < this.size; k++){
-            if (k < buf2.length) this.data[this.size - k - 1][j] = buf2[k];
-            else this.data[this.size - k - 1][j] = 0;
+            if (k < buf2.length) {
+              this.data[this.size - k - 1][j] = buf2[k];
+              this.data[this.size - k - 1][j].position = `${this.size - k - 1}${j}`;
+            }
+            else {
+              this.data[this.size - k - 1][j] = null;
+            }
           }
         }
         
@@ -161,21 +221,29 @@ export class AppComponent {
         for (let i = 0; i < this.size; i++){
           buf[i] = this.data[j][i];
         }
-        buf = buf.filter(item => item > 0);
+        buf = buf.filter(item => item !== null);
         //zeros += buf.filter(item => item === 0);
         for (let k = 0; k < buf.length; k++){
-            if (buf[k] === buf[k+1]) {
-              buf2.push(buf[k]*2);
-              k++;
+          if (k === buf.length - 1){
+            buf2.push(buf[k]);
+          } else if (buf[k].number === buf[k+1].number) {
+            buf[k+1].number *= 2;
+            buf2.push(buf[k+1]);
+            this.elements.splice(this.elements.indexOf(buf[k]), 1);
+            k++;
               //zeros += 1;
-            }
-            else {
-              buf2.push(buf[k]);
-            }
+          } else {
+            buf2.push(buf[k]);
+          }
         }
         for (let k = 0; k < this.size; k++){
-          if (k < buf2.length) this.data[j][k] = buf2[k];
-          else this.data[j][k] = 0;
+          if (k < buf2.length) {
+            this.data[j][k] = buf2[k];
+            this.data[j][k].position = `${j}${k}`;
+          }
+          else {
+            this.data[j][k] = null;
+          }
         }
       }
     }
@@ -191,11 +259,15 @@ export class AppComponent {
           for (let i = 0; i < this.size; i++){
             buf[i] = this.data[j][this.size - i - 1];
           }
-          buf = buf.filter(item => item > 0);
+          buf = buf.filter(item => item !== null);
           //zeros += buf.filter(item => item === 0);
           for (let k = 0; k < buf.length; k++){
-              if (buf[k] === buf[k+1]) {
-                buf2.push(buf[k]*2);
+              if (k === buf.length - 1){
+                buf2.push(buf[k]);
+              } else if (buf[k].number === buf[k+1].number) {
+                buf[k+1].number *= 2;
+                buf2.push(buf[k+1]);
+                this.elements.splice(this.elements.indexOf(buf[k]), 1);              
                 k++;
                 //zeros += 1;
               }
@@ -204,8 +276,13 @@ export class AppComponent {
               }
           }
           for (let k = 0; k < this.size; k++){
-            if (k < buf2.length) this.data[j][this.size - k - 1] = buf2[k];
-            else this.data[j][this.size - k - 1] = 0;
+            if (k < buf2.length) {
+              this.data[j][this.size - k - 1] = buf2[k];
+              this.data[j][this.size - k - 1].position = `${j}${this.size - k - 1}`;
+            }
+            else {
+              this.data[j][this.size - k - 1] = null;
+            }
           }
         }
     }
@@ -215,10 +292,17 @@ export class AppComponent {
         if (previousState[i][j] !== this.data[i][j]){
           isStateChanged = true;
           break stateOuter;
+        } else if (previousState[i][j] !== null){
+          if (previousState[i][j].number !== this.data[i][j].number 
+            || previousState[i][j].position !== this.data[i][j].position) {
+              isStateChanged = true;
+              break stateOuter;
+            }
         }
       }
     }
     if (isStateChanged) this.newNumber();
+    
     // if (!zeros){
     //   this.newNumber();
     // }
