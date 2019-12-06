@@ -15,54 +15,65 @@ import {
   animations: [
     trigger('itemState',[
       state('00', style({
-        transform: 'translate(0px, 0px)'
+        transform: 'translate(0px, 0px) scale(1, 1)'
       })),
       state('01', style({
-        transform: 'translate(110px, 0px)'
+        transform: 'translate(110px, 0px) scale(1, 1)'
       })),
       state('02', style({
-        transform: 'translate(220px, 0px)'
+        transform: 'translate(220px, 0px) scale(1, 1)'
       })),
       state('03', style({
-        transform: 'translate(330px, 0px)'
+        transform: 'translate(330px, 0px) scale(1, 1)'
       })),
       state('10', style({
-        transform: 'translate(0px, 110px)'
+        transform: 'translate(0px, 110px) scale(1, 1)'
       })),
       state('11', style({
-        transform: 'translate(110px, 110px)'
+        transform: 'translate(110px, 110px) scale(1, 1)'
       })),
       state('12', style({
-        transform: 'translate(220px, 110px)'
+        transform: 'translate(220px, 110px) scale(1, 1)'
       })),
       state('13', style({
-        transform: 'translate(330px, 110px)'
+        transform: 'translate(330px, 110px) scale(1, 1)'
       })),
       state('20', style({
-        transform: 'translate(0px, 220px)'
+        transform: 'translate(0px, 220px) scale(1, 1)'
       })),
       state('21', style({
-        transform: 'translate(110px, 220px)'
+        transform: 'translate(110px, 220px) scale(1, 1)'
       })),
       state('22', style({
-        transform: 'translate(220px, 220px)'
+        transform: 'translate(220px, 220px) scale(1, 1)'
       })),
       state('23', style({
-        transform: 'translate(330px, 220px)'
+        transform: 'translate(330px, 220px) scale(1, 1)'
       })),
       state('30', style({
-        transform: 'translate(0px, 330px)'
+        transform: 'translate(0px, 330px) scale(1, 1)'
       })),
       state('31', style({
-        transform: 'translate(110px, 330px)'
+        transform: 'translate(110px, 330px) scale(1, 1)'
       })),
       state('32', style({
-        transform: 'translate(220px, 330px)'
+        transform: 'translate(220px, 330px) scale(1, 1)'
       })),
       state('33', style({
-        transform: 'translate(330px, 330px)'
+        transform: 'translate(330px, 330px) scale(1, 1)'
       })),
-      transition('* => *', animate('2000ms ease')),
+      transition('* => void', [
+        animate('0ms 500ms', style({   
+          transform: 'scale(0, 0)'
+        }))
+      ]),
+      transition('void => *', [
+        style({
+          transform: 'scale(0, 0)'
+        }), animate('500ms')
+      ]),
+      
+      transition('* => *', animate('500ms ease'))
       ]
     )
   ]

@@ -3,9 +3,10 @@
 <div style="position: relative" class="box">
 
     <div 
-        style="position: absolute; background-color: brown;" 
+        style="position: absolute" 
         *ngFor="let element of elements" 
         [@itemState]="element.position"
+        class="value-{{element.number}}"
     ><p>{{ element.number || " " }}</p></div>
     
     <div></div>
