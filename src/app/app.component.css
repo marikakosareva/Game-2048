@@ -21,12 +21,15 @@
     color: cornsilk;
 }
 
-.game-content {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
+.box div.game-over {
+    width: 440px;
+    height: 440px;
+    background-color: #0000007a;
+    border-radius: 5px;
+    position: absolute;
+    margin: 0px;
+    z-index: 1;
+    font-size: 40px;
 }
 
 .box div.value-2{
@@ -63,3 +66,59 @@
     background-color: #e06f2e;
     font-size: 40px;
 }
+
+.box div.value-256{
+    background-color: #e0d42e;
+    font-size: 40px;
+}
+
+.box div.value-512{
+    background-color: #e0b02e;
+    font-size: 40px;
+}
+
+.box div.value-1024{
+    background-color: #e06f2e;
+    font-size: 30px;
+}
+
+.box div.value-1024{
+    background-color: #ff0000;
+    font-size: 30px;
+}
+
+.game-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.info {
+    display: flex; 
+    flex-direction: column; 
+    justify-content:space-evenly;
+    align-items: center; 
+    height: 450px; 
+    width: 200px;
+}
+
+.info button {
+    width: 100px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 5px;
+    color: cornsilk;
+    background-color: #d8574a;
+    font-size: 16px;
+}
+
+.score {
+    display: flex;
+    flex-direction: column; 
+    justify-content:center;
+    align-items: center; 
+    font-size: 30px; 
+}
+

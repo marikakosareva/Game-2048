@@ -1,36 +1,31 @@
 
 <div class="game-content" (keypress)="onKey($event)" tabindex="1">
-<div style="position: relative" class="box">
+    <div class="info">
+        <div class="score">
+            <p>You score:</p>
+            <p>{{score}}</p>
+        </div>
+        <div>
+            <button (click)="restart()">RESTART</button>
+        </div>
+    </div>
+    
+    <div style="position: relative" class="box">
 
-    <div 
-        style="position: absolute" 
-        *ngFor="let element of elements" 
-        [@itemState]="element.position"
-        class="value-{{element.number}}"
-    ><p>{{ element.number || " " }}</p></div>
-    
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    
-</div>
-</div>
+        <div *ngIf="gameOver" class="game-over"> 
+            GAME OVER  
+        </div>
 
+        <div 
+            style="position: absolute" 
+            *ngFor="let element of elements" 
+            [@itemState]="element.position"
+            class="value-{{element.number}}"
+        ><p>{{ element.number || " " }}</p></div>
+
+        
+        <div *ngFor="let i of layout"></div>   
+    </div>
+</div>
 
 <router-outlet></router-outlet>

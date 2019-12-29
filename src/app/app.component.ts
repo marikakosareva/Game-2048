@@ -78,11 +78,15 @@ import {
     )
   ]
 })
+
 export class AppComponent implements OnInit {
-  title = 'game2048';
-  position: string;
-  
+
+  title = 'Game2048';
   elements = [];
+  size = 4;
+  layout = new Array(16);
+  score = 0;
+  gameOver = false;
 
   data = [
     [null, null, null, null],
@@ -90,8 +94,6 @@ export class AppComponent implements OnInit {
     [null, null, null, null],
     [null, null, null, null]
   ];
-
-  size = 4;
 
   ngOnInit() {
     this.newNumber();
@@ -113,23 +115,37 @@ export class AppComponent implements OnInit {
      
     let index = this.getRandomInt(emptySpots);
     outer:  for (let i = 0; i < this.size; i++){
-        for (let j = 0; j < this.size; j++){
-          if (this.data[i][j] === null) {
-            if (index === 0) {
-              this.data[i][j] = {position:`${i}${j}`, number: 2};
-              this.elements.push(this.data[i][j]);
-              break outer;
-            } else {
-              index --;
+              for (let j = 0; j < this.size; j++){
+                if (this.data[i][j] === null) {
+                  if (index === 0) {
+                    this.data[i][j] = {position:`${i}${j}`, number: 2};
+                    this.elements.push(this.data[i][j]);
+                    break outer;
+                  } else {
+                    index --;
+                  }
+                }
+              }
             }
-          }
-        }
+
+    if (this.elements.length === this.size ** 2) {
+      let flagGameOver = true;
+      gameOver: for (let i = 0; i < this.size; i++){
+                  for (let j = 0; j < this.size - 1; j++){
+                    if ((this.data[i][j].number === this.data[i][j+1].number) ||
+                    (this.data[j][i].number === this.data[j+1][i].number)) {
+                      flagGameOver = false;
+                      break gameOver;
+                    }
+                  }
+                }
+      if (flagGameOver) {
+        this.gameOver = true;
       }
+    }
   }
 
-  changePosition(newPosition: string){
-      this.position = newPosition;
-  }
+
 
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
@@ -140,11 +156,8 @@ export class AppComponent implements OnInit {
         previousState[i][j] = this.data[i][j];
       }
     }
-    //let zeros = 0;
+
     if (event.keyCode == 38) {
-      //this.newNumber();
-      //this.changePosition("up");
-      //alert(event.keyCode);
       let buf = null;
       let buf2 = null;
       for (let j = 0; j < this.size; j++){
@@ -154,20 +167,19 @@ export class AppComponent implements OnInit {
           buf[i] = this.data[i][j];
         }
         buf = buf.filter(item => item !== null);
-        //zeros += buf.filter(item => item === 0);
         for (let k = 0; k < buf.length; k++){
-            if (k === buf.length - 1){
-              buf2.push(buf[k]);
-            } else if (buf[k].number === buf[k+1].number) {
-              buf[k+1].number *= 2;
-              buf2.push(buf[k+1]);
-              this.elements.splice(this.elements.indexOf(buf[k]), 1);
-              k++;
-              //zeros += 1;
-            }
-            else {
-              buf2.push(buf[k]);
-            }
+          if (k === buf.length - 1){
+            buf2.push(buf[k]);
+          } else if (buf[k].number === buf[k+1].number) {
+            buf[k+1].number *= 2;
+            this.score += buf[k+1].number;
+            buf2.push(buf[k+1]);
+            this.elements.splice(this.elements.indexOf(buf[k]), 1);
+            k++;
+          }
+          else {
+            buf2.push(buf[k]);
+          }
         }
         for (let k = 0; k < this.size; k++){
           if (k < buf2.length) {
@@ -181,49 +193,41 @@ export class AppComponent implements OnInit {
       }
     }
     else if (event.keyCode == 40) {
-        // down arrow
-        //this.changePosition("down");
-        //alert(event.keyCode);
-        let buf = null;
-        let buf2 = null;
-        for (let j = 0; j < this.size; j++){
-          buf = [];
-          buf2 = [];
-          for (let i = 0; i < this.size; i++){
-            buf[i] = this.data[this.size - i - 1][j];
+      let buf = null;
+      let buf2 = null;
+      for (let j = 0; j < this.size; j++){
+        buf = [];
+        buf2 = [];
+        for (let i = 0; i < this.size; i++){
+          buf[i] = this.data[this.size - i - 1][j];
+        }
+        buf = buf.filter(item => item !== null);
+        for (let k = 0; k < buf.length; k++){
+          if (k === buf.length - 1){
+            buf2.push(buf[k]);
+          } else if (buf[k].number === buf[k+1].number) {
+            buf[k+1].number *= 2;
+            this.score += buf[k+1].number;
+            buf2.push(buf[k+1]);
+            this.elements.splice(this.elements.indexOf(buf[k]), 1);
+            k++;
           }
-          buf = buf.filter(item => item !== null);
-          //zeros += buf.filter(item => item === 0);
-          for (let k = 0; k < buf.length; k++){
-              if (k === buf.length - 1){
-                buf2.push(buf[k]);
-              } else if (buf[k].number === buf[k+1].number) {
-                buf[k+1].number *= 2;
-                buf2.push(buf[k+1]);
-                this.elements.splice(this.elements.indexOf(buf[k]), 1);
-                k++;
-                //zeros += 1;
-              }
-              else {
-                buf2.push(buf[k]);
-              }
-          }
-          for (let k = 0; k < this.size; k++){
-            if (k < buf2.length) {
-              this.data[this.size - k - 1][j] = buf2[k];
-              this.data[this.size - k - 1][j].position = `${this.size - k - 1}${j}`;
-            }
-            else {
-              this.data[this.size - k - 1][j] = null;
-            }
+          else {
+            buf2.push(buf[k]);
           }
         }
-        
+        for (let k = 0; k < this.size; k++){
+          if (k < buf2.length) {
+            this.data[this.size - k - 1][j] = buf2[k];
+            this.data[this.size - k - 1][j].position = `${this.size - k - 1}${j}`;
+          }
+          else {
+            this.data[this.size - k - 1][j] = null;
+          }
+        }
+      }   
     }
     else if (event.keyCode == 37) {
-      // left arrow
-      //this.changePosition("left");
-      //alert(event.keyCode);
       let buf = null;
       let buf2 = null;
       for (let j = 0; j < this.size; j++){
@@ -233,16 +237,15 @@ export class AppComponent implements OnInit {
           buf[i] = this.data[j][i];
         }
         buf = buf.filter(item => item !== null);
-        //zeros += buf.filter(item => item === 0);
         for (let k = 0; k < buf.length; k++){
           if (k === buf.length - 1){
             buf2.push(buf[k]);
           } else if (buf[k].number === buf[k+1].number) {
             buf[k+1].number *= 2;
+            this.score += buf[k+1].number;
             buf2.push(buf[k+1]);
             this.elements.splice(this.elements.indexOf(buf[k]), 1);
             k++;
-              //zeros += 1;
           } else {
             buf2.push(buf[k]);
           }
@@ -259,43 +262,39 @@ export class AppComponent implements OnInit {
       }
     }
     else if (event.keyCode == 39) {
-      // right arrow
-      //this.changePosition("right");
-      //alert(event.keyCode);
       let buf = null;
-        let buf2 = null;
-        for (let j = 0; j < this.size; j++){
-          buf = [];
-          buf2 = [];
-          for (let i = 0; i < this.size; i++){
-            buf[i] = this.data[j][this.size - i - 1];
+      let buf2 = null;
+      for (let j = 0; j < this.size; j++){
+        buf = [];
+        buf2 = [];
+        for (let i = 0; i < this.size; i++){
+          buf[i] = this.data[j][this.size - i - 1];
+        }
+        buf = buf.filter(item => item !== null);
+        for (let k = 0; k < buf.length; k++){
+          if (k === buf.length - 1){
+            buf2.push(buf[k]);
+          } else if (buf[k].number === buf[k+1].number) {
+            buf[k+1].number *= 2;
+            this.score += buf[k+1].number;
+            buf2.push(buf[k+1]);
+            this.elements.splice(this.elements.indexOf(buf[k]), 1);              
+            k++;
           }
-          buf = buf.filter(item => item !== null);
-          //zeros += buf.filter(item => item === 0);
-          for (let k = 0; k < buf.length; k++){
-              if (k === buf.length - 1){
-                buf2.push(buf[k]);
-              } else if (buf[k].number === buf[k+1].number) {
-                buf[k+1].number *= 2;
-                buf2.push(buf[k+1]);
-                this.elements.splice(this.elements.indexOf(buf[k]), 1);              
-                k++;
-                //zeros += 1;
-              }
-              else {
-                buf2.push(buf[k]);
-              }
-          }
-          for (let k = 0; k < this.size; k++){
-            if (k < buf2.length) {
-              this.data[j][this.size - k - 1] = buf2[k];
-              this.data[j][this.size - k - 1].position = `${j}${this.size - k - 1}`;
-            }
-            else {
-              this.data[j][this.size - k - 1] = null;
-            }
+          else {
+            buf2.push(buf[k]);
           }
         }
+        for (let k = 0; k < this.size; k++){
+          if (k < buf2.length) {
+            this.data[j][this.size - k - 1] = buf2[k];
+            this.data[j][this.size - k - 1].position = `${j}${this.size - k - 1}`;
+          }
+          else {
+            this.data[j][this.size - k - 1] = null;
+          }
+        }
+      }
     }
     let isStateChanged = false;
     stateOuter: for (let i = 0; i < this.size; i++){
@@ -308,18 +307,24 @@ export class AppComponent implements OnInit {
             || previousState[i][j].position !== this.data[i][j].position) {
               isStateChanged = true;
               break stateOuter;
-            }
+          }
         }
       }
     }
+
     if (isStateChanged) this.newNumber();
-    
-    // if (!zeros){
-    //   this.newNumber();
-    // }
   }
 
-  onKey(event: any) {
-    //alert("lal");
+  restart() {
+    this.elements = [];
+    this.score = 0;
+    this.data = [
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]
+    ];
+    this.newNumber();
+    this.gameOver = false;
   }
 }
